@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Form Auto Helper",
+  "version": "1.0",
+  "permissions": ["clipboardRead", "scripting", "activeTab"],
+  "host_permissions": ["https://docs.google.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://docs.google.com/forms/*"],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ]
+}
