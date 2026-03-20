@@ -1,8 +1,9 @@
 // === CONFIG ===
 const POST_CODE_LABEL = "Post Code";
 const COMMENT_LABEL = "Comments Link";
+const STORAGE_KEY = "auto_post_code_counter";
 
-// === UTIL: find input by label ===
+// === FIND INPUT BY LABEL ===
 function findInput(labelText) {
   const labels = document.querySelectorAll(".M7eMe");
   for (let label of labels) {
@@ -14,32 +15,68 @@ function findInput(labelText) {
   return null;
 }
 
-// === CREATE UI BUTTONS ===
+// === STORAGE HANDLING ===
+function getStoredNumber() {
+  return parseInt(localStorage.getItem(STORAGE_KEY) || "1");
+}
+
+function setStoredNumber(val) {
+  localStorage.setItem(STORAGE_KEY, val);
+}
+
+// === CREATE TOUCH UI ===
 function createControls(input) {
   if (!input || input.dataset.modified) return;
 
   input.type = "number";
   input.dataset.modified = "true";
 
+  // Load saved value
+  let current = getStoredNumber();
+  input.value = current;
+
   const wrapper = document.createElement("div");
   wrapper.className = "custom-controls";
 
+  // BUTTONS
   const btnCheck = document.createElement("button");
   btnCheck.innerText = "✔";
 
-  const btnOne = document.createElement("button");
-  btnOne.innerText = "1";
+  const btnPlus = document.createElement("button");
+  btnPlus.innerText = "+";
 
-  const btnUp = document.createElement("button");
-  btnUp.innerText = "↑";
+  const btnReset = document.createElement("button");
+  btnReset.innerText = "RESET";
 
-  // Actions
-  btnCheck.onclick = () => input.value = parseInt(input.value || 0);
-  btnOne.onclick = () => input.value = 1;
-  btnUp.onclick = () => input.value = (parseInt(input.value || 0) + 1);
+  // === TOUCH SUPPORT ===
+  [btnCheck, btnPlus, btnReset].forEach(btn => {
+    btn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      btn.click();
+    });
+  });
 
-  wrapper.append(btnCheck, btnOne, btnUp);
+  // === ACTIONS ===
 
+  // ✔ Save current and prepare next
+  btnCheck.onclick = () => {
+    let val = parseInt(input.value || 0);
+    setStoredNumber(val + 1); // next number on reload
+  };
+
+  // + increment live
+  btnPlus.onclick = () => {
+    let val = parseInt(input.value || 0) + 1;
+    input.value = val;
+  };
+
+  // RESET counter
+  btnReset.onclick = () => {
+    setStoredNumber(1);
+    input.value = 1;
+  };
+
+  wrapper.append(btnCheck, btnPlus, btnReset);
   input.parentElement.appendChild(wrapper);
 }
 
@@ -49,6 +86,7 @@ let lastClipboard = "";
 async function monitorClipboard() {
   try {
     const text = await navigator.clipboard.readText();
+
     if (text && text !== lastClipboard) {
       lastClipboard = text;
 
@@ -58,9 +96,7 @@ async function monitorClipboard() {
         commentInput.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }
-  } catch (e) {
-    console.log("Clipboard access denied");
-  }
+  } catch (e) {}
 }
 
 // === INIT LOOP ===
@@ -68,4 +104,4 @@ setInterval(() => {
   const postInput = findInput(POST_CODE_LABEL);
   createControls(postInput);
   monitorClipboard();
-}, 1500);
+}, 1200);
