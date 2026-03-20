@@ -1,22 +1,29 @@
 .custom-controls {
-  margin-top: 10px;
+  margin-top: 12px;
   display: flex;
   gap: 10px;
+  justify-content: flex-start;
 }
 
 .custom-controls button {
-  padding: 12px 14px;   /* bigger for touch */
+  padding: 12px 16px;
   font-size: 16px;
   border: none;
   background: #2962ff;
   color: white;
   font-weight: bold;
   border-radius: 8px;
-  cursor: pointer;
   min-width: 60px;
 }
 
-/* Active touch feedback */
-.custom-controls button:active {
-  background: #0039cb;
+/* FIX INPUT VISIBILITY */
+input.whsOnd {
+  background: transparent !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* REMOVE OVERLAY ISSUE */
+.ndJi5d {
+  display: none !important;
 }
